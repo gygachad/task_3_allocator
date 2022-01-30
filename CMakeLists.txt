@@ -12,8 +12,7 @@ configure_file(version.h.in version.h)
 file(COPY ${CMAKE_BINARY_DIR}/version.h
         DESTINATION ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(allocator main.cpp allocator.cpp version.cpp)
-add_library(allocator_lib allocator.cpp version.cpp)
+add_executable(allocator main.cpp version.cpp)
 
 set_target_properties(allocator PROPERTIES
     CXX_STANDARD 17
@@ -23,10 +22,6 @@ set_target_properties(allocator PROPERTIES
 target_include_directories(allocator
     PRIVATE "${CMAKE_BINARY_DIR}"
 )
-
-#target_link_libraries(allocator PRIVATE
-#   allocator_lib
-#)
 
 if(WITH_GOOGLE_TEST)
 
