@@ -9,7 +9,9 @@ class Allocator
 {
 public:
 	bool* m_allocated = nullptr;
-	T* m_mem_pool = nullptr;
+	byte* m_mem_pool = nullptr;
+
+	size_t m_item_size = sizeof(T);
 	size_t m_default_items_count = 0x100;
 
 	size_t m_mem_allocated = 0x0;
@@ -21,25 +23,26 @@ public:
 	using reference = T&;
 	using const_reference = const T&;
 
+	
 	template <typename U>
 	struct rebind { using other = Allocator<U>; };
-
+	
 	Allocator()
 	{
 		m_allocated = (bool*)malloc(sizeof(bool) * m_default_items_count);
-		m_mem_pool = (T*)malloc(sizeof(T) * m_default_items_count);
+		m_mem_pool = (byte*)malloc(m_item_size * m_default_items_count);
 
 		if (!m_allocated || !m_mem_pool)
 			throw bad_alloc();
 
 		memset(m_allocated, 0x0, sizeof(bool) * m_default_items_count);
-		memset(m_mem_pool, 0x0, sizeof(T) * m_default_items_count);
+		memset(m_mem_pool, 0x0, m_item_size * m_default_items_count);
 
-		m_mem_allocated = sizeof(T) * m_default_items_count;
+		m_mem_allocated = m_item_size * m_default_items_count;
 
 #ifdef DBG_PRINT
 		PRINT_PRETTY();
-		cout << "Allocated pool " << m_mem_pool << endl;
+		cout << "Allocator " << this << " ---> pool " << m_mem_pool << endl;
 #endif
 	}
 
@@ -50,7 +53,7 @@ public:
 
 #ifdef DBG_PRINT
 		PRINT_PRETTY();
-		cout << "Free pool " << m_mem_pool << endl;
+		cout << "Destructor " << this << " ---> pool " << m_mem_pool << endl;
 #endif
 	}
 
@@ -58,17 +61,24 @@ public:
 	Allocator(const Allocator<U>& other)
 	{
 		m_allocated = (bool*)malloc(sizeof(bool) * m_default_items_count);
-		m_mem_pool = (T*)malloc(sizeof(U) * m_default_items_count);
-
+		m_mem_pool = (byte*)malloc(m_item_size * m_default_items_count);
+		
+		m_mem_allocated = m_item_size * m_default_items_count;
+		
 		if (!m_allocated || !m_mem_pool)
 			throw bad_alloc();
 
+		/*
 		memcpy(m_allocated, other.m_allocated, sizeof(bool) * m_default_items_count);
-		memcpy(m_mem_pool, other.m_mem_pool, sizeof(U) * m_default_items_count);
+		memcpy(m_mem_pool, other.m_mem_pool, m_item_size * m_default_items_count);
+		*/
 
+		memset(m_allocated, 0x0, sizeof(bool) * m_default_items_count);
+		memset(m_mem_pool, 0x0, m_mem_allocated);
+		
 #ifdef DBG_PRINT
 		PRINT_PRETTY();
-		cout << "Copy pool from " << other.m_mem_pool << " to " << m_mem_pool << endl;
+		cout << "Copy " << this << " ---> " << m_mem_pool << " from " << other.m_mem_pool << endl;
 #endif
 	}
 
@@ -106,7 +116,7 @@ public:
 					m_allocated[j] = true;
 				}
 
-				p = m_mem_pool + i;
+				p = reinterpret_cast<T*>( m_mem_pool + i*m_item_size);
 
 				break;
 			}
@@ -114,7 +124,7 @@ public:
 
 #ifdef DBG_PRINT
 		PRINT_PRETTY();
-		cout << "allocate " << p << " from pool " << m_mem_pool << std::endl;
+		cout << "Allocator " << this << " ---> allocate " << p << " from pool " << m_mem_pool << std::endl;
 #endif
 		return p;
 	}
