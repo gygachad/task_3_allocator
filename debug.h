@@ -2,7 +2,7 @@
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
 
-#define DBG_PRINT
+//#define DBG_PRINT
 
 #ifdef DBG_PRINT
 #define DEBUG_MSG(str)  std::cout << str << std::endl;

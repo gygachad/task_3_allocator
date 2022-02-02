@@ -214,7 +214,7 @@ class linear_allocator
 	//const size_t m_reserved = 0x100;
 
 public:
-	shared_ptr<mem_pool<5>> m_shared_mem_pool = make_shared<mem_pool<5>>();
+	shared_ptr<mem_pool<0x5000>> m_shared_mem_pool = make_shared<mem_pool<0x5000>>();
 
 	using value_type = T;
 
