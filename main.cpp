@@ -8,8 +8,7 @@
 
 using namespace std;
 
-/*
-void print_map(const map<int, string, less<int>, Allocator<pair<const int, string>>>& m)
+void print_map(const map<int, string, less<int>, linear_allocator<pair<const int, string>>>& m)
 {
     for (const auto& [key, value] : m) {
         std::cout << '[' << key << "] = " << value << "; ";
@@ -17,7 +16,6 @@ void print_map(const map<int, string, less<int>, Allocator<pair<const int, strin
     
     std::cout << '\n';
 }
-*/
 
 template<typename T>
 class A
@@ -56,26 +54,40 @@ public:
 
 int main() 
 {
-    {
-        vector<int, Allocator<int>> v;
-
-        v.push_back(12);
-    }
-
     /*
-    map<int, string, less<int>, Allocator<pair<const int, string>>> m;
-
-    
-    for (int i = 0; i < 10; i++)
     {
-        m[i] = to_string(i);
+        vector<int, linear_allocator<int>> v;
+
+        for (int i = 1; i < 10; i++)
+        {
+            v.push_back(i);
+        }
+
+        for (int i = 0; i < 9; i++)
+            cout << v[i];
     }
-
-    m[11] = "11";
-
-    print_map(m);
-
-    //m.clear();
     */
+    while (true)
+    {
+        {
+            map<int, string, less<int>, linear_allocator<pair<const int, string>>> m;
+
+            for (int i = 0; i < 5; i++)
+            {
+                m[i] = to_string(i);
+            }
+
+            for (int i = 0; i < 4; i++)
+            {
+                m.erase(i);
+            }
+
+            //m[11] = "11";
+
+            print_map(m);
+        }
+    }
+    //m.clear();
+    
     return 0;
 }
