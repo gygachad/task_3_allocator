@@ -15,18 +15,36 @@ using std::chrono::milliseconds;
 template<typename T>
 void print_map(const T& m)
 {
-    for (const auto& [key, value] : m) {
+    for (const auto& [key, value] : m) 
         std::cout << '[' << key << "] = " << value << "; ";
-    }
     
     std::cout << '\n';
 }
 
 int main() 
 {
+    
+    /*
+    {
+        map<int, string, less<int>, linear_allocator<pair<const int, string>>> m;
+
+        for (int i = 0; i < 0x5; i++)
+        {
+            m[i] = to_string(i);
+        }
+
+        for (int i = 0; i < 3; i++)
+        {
+            m.erase(i);
+        }
+
+        print_map(m);
+    }
+    */
+    
+    
     while (true)
     {
-        /*
         auto t1 = high_resolution_clock::now();
         {
             vector<string, linear_allocator<string>> v;
@@ -67,7 +85,7 @@ int main()
         ms_int = duration_cast<milliseconds>(t2 - t1);
         std::cout << ms_int.count() << "ms for default allocator\n";
     }
-    */
+    
     /*
     while (true)
     {
@@ -84,8 +102,6 @@ int main()
             {
                 m.erase(i);
             }
-
-            //m[11] = "11";
 
             print_map(m);
         }
@@ -120,6 +136,5 @@ int main()
         std::cout << ms_int.count() << "ms for default allocator\n";
     }
     */
-    
     return 0;
 }

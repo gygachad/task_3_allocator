@@ -8,15 +8,15 @@ using namespace std;
 
 struct mem_block
 {
-	bool* m_allocated		= nullptr;
+	bool* m_alloc_bytemap	= nullptr;
 	byte* m_mem_pool_start	= nullptr;
 	byte* m_mem_pool_end	= nullptr;
 
 	size_t m_item_size			= 0x0;
 	size_t m_free_items_count	= 0x0;
-	size_t m_reserve_items		= 0x100;
-
-	size_t m_mem_allocated = 0x0;
+	size_t m_reserve_items		= 0x0;
+	size_t m_last_free_pos		= 0x0;
+	size_t m_mem_allocated		= 0x0;
 
 	mem_block(size_t item_size, size_t reserve_items = 0x100)
 	{
@@ -25,16 +25,16 @@ struct mem_block
 
 		m_free_items_count = reserve_items;
 
-		m_allocated = (bool*)malloc(sizeof(bool) * reserve_items);
+		m_alloc_bytemap = (bool*)malloc(sizeof(bool) * reserve_items);
 		m_mem_pool_start = (byte*)malloc(m_item_size * reserve_items);
 
-		if (!m_allocated || !m_mem_pool_start)
+		if (!m_alloc_bytemap || !m_mem_pool_start)
 			throw bad_alloc();
 
 		m_mem_allocated = m_item_size * reserve_items;
 		m_mem_pool_end = m_mem_pool_start + m_mem_allocated;
 
-		memset(m_allocated, 0x0, sizeof(bool) * reserve_items);
+		memset(m_alloc_bytemap, 0x0, sizeof(bool) * reserve_items);
 		memset(m_mem_pool_start, 0x0, m_item_size * reserve_items);
 
 		DEBUG_MSG("mem_block [" << this << "] -> m_mem_pool  [" << m_mem_pool_start << "]" << endl);
@@ -44,7 +44,7 @@ struct mem_block
 
 	~mem_block()
 	{
-		free(m_allocated);
+		free(m_alloc_bytemap);
 		free(m_mem_pool_start);
 
 		DEBUG_MSG("~mem_block() [" << this << "] -> free(m_mem_pool) [" << m_mem_pool_start << "]" << endl);
@@ -56,18 +56,24 @@ struct mem_block
 		byte* p = nullptr;
 
 		//We need reallocate pool
-		if (n > m_reserve_items)
+		if (m_free_items_count == 0x0 || n > m_reserve_items)
 			return nullptr;
+		
+		size_t start_pos = 0x0;
+
+		//If we have enough items in the end - start with it
+		if (m_reserve_items - m_last_free_pos >= n)
+			start_pos = m_last_free_pos;
 
 		//Try to find sequence of n free items
-		for (size_t i = 0; i <= m_reserve_items - n; i++)
+		for (size_t i = start_pos; i <= m_reserve_items - n; i++)
 		{
 			bool success = true;
 
 			for (size_t j = i; j < i + n; j++)
 			{
 				//This item already allocated. Try another one
-				if (m_allocated[j])
+				if (m_alloc_bytemap[j])
 				{
 					success = false;
 					break;
@@ -76,12 +82,20 @@ struct mem_block
 
 			if (success)
 			{
+				size_t next_free_pos = 0;
 				//Now they are allocated
 				for (size_t j = i; j < i + n; j++)
 				{
-					m_allocated[j] = true;
+					m_alloc_bytemap[j] = true;
+					next_free_pos = j + 1;
 				}
-				
+
+				if (i + n == m_reserve_items)
+					next_free_pos = 0;
+
+				//Set next free item position
+				m_last_free_pos = next_free_pos;
+
 				//Calculate start address of allocated sequnce
 				p = (m_mem_pool_start + i * m_item_size);
 
@@ -102,15 +116,15 @@ struct mem_block
 	{		
 		//Let's check - if this item from another mem_block with same m_item_size
 		if (m_mem_pool_start <= p &&
-			p < m_mem_pool_end
-			)
+			p < m_mem_pool_end)
 		{
 			unsigned __int64 pos = (p - m_mem_pool_start)/m_item_size;
 			for (size_t i = 0; i < n; i++)
 			{
-				m_allocated[pos] = false;
+				m_alloc_bytemap[pos] = false;
 			}
 
+			m_last_free_pos = pos;
 			m_free_items_count += n;
 
 			return true;
@@ -123,16 +137,15 @@ struct mem_block
 };
 
 template<size_t reserved>
-//static_assert
 class mem_pool
 {
+	static_assert(reserved != 0, "Reserved can't be 0");
+
 	list<mem_block*> m_block_list;
 	size_t m_reserved_items = reserved;
 
 public:
-	mem_pool()
-	{
-	}
+	mem_pool(){}
 
 	~mem_pool() 
 	{
@@ -174,7 +187,7 @@ public:
 	template <typename T>
 	void deallocate(T* p, size_t n)
 	{
-		mem_block* empty_block = nullptr;
+		mem_block* block_for_delete = nullptr;
 
 		for (mem_block* block : m_block_list)
 		{
@@ -190,20 +203,19 @@ public:
 				{
 					//Check for block empty
 					if (block->m_free_items_count == block->m_reserve_items)
-					{
-						empty_block = block;		
-					}
+						block_for_delete = block;
+
 					//n items successfully deallocated
 					break;
 				}
 			}
 		}
 
-		if (empty_block)
+		//Free this mem_block. It's empty now
+		if (block_for_delete)
 		{
-			//Free this mem_block. It's empty now
-			m_block_list.remove(empty_block);
-			delete empty_block;
+			m_block_list.remove(block_for_delete);
+			delete block_for_delete;
 		}
 	}
 };
@@ -214,7 +226,7 @@ class linear_allocator
 	//const size_t m_reserved = 0x100;
 
 public:
-	shared_ptr<mem_pool<0x5000>> m_shared_mem_pool = make_shared<mem_pool<0x5000>>();
+	shared_ptr<mem_pool<0x1000>> m_shared_mem_pool = make_shared<mem_pool<0x1000>>();
 
 	using value_type = T;
 
