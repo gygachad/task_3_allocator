@@ -26,7 +26,7 @@ target_include_directories(allocator
 if(WITH_GOOGLE_TEST)
 
     find_package(GTest REQUIRED)
-    find_package(benchmark REQUIRED)
+    #find_package(benchmark REQUIRED)
     add_executable(gtest_allocator gtest_allocator.cpp version.cpp)
     # add_executable(gbenchamark_allocator gbenchamark_allocator.cpp)
 

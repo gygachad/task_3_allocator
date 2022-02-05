@@ -25,21 +25,21 @@ jobs:
     - run: cmake --build googletest/. --config Release
     - run: cmake --install googletest/.
 
-    - name: Setup Google benchmark
-      uses: actions/checkout@v2
-      with:
-        repository: google/benchmark
-        path: googlebenchmark
+    #- name: Setup Google benchmark
+    #  uses: actions/checkout@v2
+    #  with:
+    #    repository: google/benchmark
+    #    path: googlebenchmark
 
-    - run: cmake googlebenchmark/.
-    - run: cmake --build googlebenchmark/. --config Release
-    - run: cmake --install googlebenchmark/.
+    #- run: cmake googlebenchmark/.
+    #- run: cmake --build googlebenchmark/. --config Release
+    #- run: cmake --install googlebenchmark/.
 
     - uses: actions/checkout@v2
       with:
         submodules: true
   
-    - run: cmake . -DPATCH_VERSION=${{ github.run_number }} cmake .. -DGTEST_ROOT="C:/Program Files (x86)/googletest-distribution/" -DGBENCHMARK_ROOT="c:/Program Files (x86)/benchmark/""
+    - run: cmake . -DPATCH_VERSION=${{ github.run_number }} cmake .. -DGTEST_ROOT="C:/Program Files (x86)/googletest-distribution/" -DGBENCHMARK_ROOT="c:/Program Files (x86)/benchmark/"
     - run: cmake --build . --config Release
     - run: cmake --build . --config Release --target RUN_TESTS
     - run: cmake --build . --config Release --target package
