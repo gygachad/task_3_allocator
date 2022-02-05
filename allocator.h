@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+#include <cassert>
 
 #include "debug.h"
 
@@ -54,10 +55,6 @@ struct mem_block
 	byte* allocate(size_t n)
 	{
 		byte* p = nullptr;
-
-		//We need reallocate pool
-		if (m_free_items_count == 0x0 || n > m_reserve_items)
-			return nullptr;
 		
 		size_t start_pos = 0x0;
 
@@ -166,7 +163,15 @@ public:
 			if (sizeof(T) != block->m_item_size)
 				continue;
 
+			//This block is full of items
+			if (block->m_free_items_count == 0x0 || n > block->m_reserve_items)
+				continue;
+
 			p = reinterpret_cast<T*>(block->allocate(n));
+
+			//Item allocated
+			if (p)
+				break;
 		}
 
 		//It's possible if block does't contain sequnce of n items
@@ -176,9 +181,12 @@ public:
 			//Add new mem_block. Check - if requsted n bigger then reserved
 			mem_block* block = new mem_block(sizeof(T), n <= m_reserved_items ? m_reserved_items : n);
 
-			m_block_list.push_back(block);
+			//First block for container proxy - put it in the end
+			m_block_list.push_front(block);
 
 			p = reinterpret_cast<T*>(block->allocate(n));
+
+			assert(p);
 		}
 
 		return p;
@@ -250,7 +258,7 @@ public:
 
 	T* allocate(size_t n)
 	{
-		T* p = reinterpret_cast<T*>(m_shared_mem_pool->allocate<T>(n));
+		T* p = m_shared_mem_pool->allocate<T>(n);
 
 		return p;
 	}

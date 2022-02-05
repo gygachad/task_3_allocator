@@ -16,33 +16,34 @@ template<typename T>
 void print_map(const T& m)
 {
     for (const auto& [key, value] : m) 
-        std::cout << '[' << key << "] = " << value << "; ";
+        std::cout << key << " " << value << endl;
     
     std::cout << '\n';
+}
+
+int factorial(unsigned int n)
+{
+    if (n == 0)
+        return 1;
+    return n * factorial(n - 1);
 }
 
 int main() 
 {
     
-    /*
+    map<int, int, less<int>, linear_allocator<pair<const int, int>>> m1;
+    map<int, int> m2;
+
+    for (int i = 0; i < 10; i++)
     {
-        map<int, string, less<int>, linear_allocator<pair<const int, string>>> m;
-
-        for (int i = 0; i < 0x5; i++)
-        {
-            m[i] = to_string(i);
-        }
-
-        for (int i = 0; i < 3; i++)
-        {
-            m.erase(i);
-        }
-
-        print_map(m);
+        m1[i] = factorial(i);
+        m2[i] = factorial(i);
     }
-    */
+
+    print_map(m1);
+    print_map(m2);
     
-    
+    /*
     while (true)
     {
         auto t1 = high_resolution_clock::now();
@@ -86,16 +87,21 @@ int main()
         std::cout << ms_int.count() << "ms for default allocator\n";
     }
     
-    /*
+    
     while (true)
     {
         auto t1 = high_resolution_clock::now();
         {
             map<int, string, less<int>, linear_allocator<pair<const int, string>>> m;
 
-            for (int i = 0; i < 0x10000; i++)
+            for (int i = 0; i < 0x20000; i++)
             {
                 m[i] = to_string(i);
+            }
+
+            for (int i = 0; i < 0x20000; i++)
+            {
+                m[i] = m[i] + to_string(i);
             }
 
             for (int i = 0; i < 0xffff; i++)
@@ -103,7 +109,7 @@ int main()
                 m.erase(i);
             }
 
-            print_map(m);
+            //print_map(m);
         }
         auto t2 = high_resolution_clock::now();
 
@@ -115,9 +121,14 @@ int main()
         {
             map<int, string> m;
 
-            for (int i = 0; i < 0x10000; i++)
+            for (int i = 0; i < 0x20000; i++)
             {
                 m[i] = to_string(i);
+            }
+
+            for (int i = 0; i < 0x20000; i++)
+            {
+                m[i] = m[i] + to_string(i);
             }
 
             for (int i = 0; i < 0xffff; i++)
@@ -125,9 +136,7 @@ int main()
                 m.erase(i);
             }
 
-            //m[11] = "11";
-
-            print_map(m);
+            //print_map(m);
         }
         t2 = high_resolution_clock::now();
 

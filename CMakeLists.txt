@@ -5,7 +5,7 @@ set(PROJECT_VESRION 0.0.${PATCH_VERSION})
 
 project(allocator VERSION ${PROJECT_VESRION})
 
-option(WITH_GOOGLE_TEST "Google test" OFF)
+option(WITH_GOOGLE_TEST "Google test" ON)
 
 configure_file(version.h.in version.h)
 
@@ -26,19 +26,22 @@ target_include_directories(allocator
 if(WITH_GOOGLE_TEST)
 
     find_package(GTest REQUIRED)
-    add_executable(gtest_allocator gtest_allocator.cpp)
+    find_package(benchmark REQUIRED)
+    add_executable(gtest_allocator gtest_allocator.cpp version.cpp)
+    # add_executable(gbenchamark_allocator gbenchamark_allocator.cpp)
 
     set_target_properties(gtest_allocator PROPERTIES
         CXX_STANDARD 17
         CXX_STANDARD_REQUIRED ON
     )
 
-    include_directories(${GTEST_INCLUDE_DIR})
+    include_directories(
+        ${GTEST_INCLUDE_DIR}
+    )
 
     target_link_libraries(gtest_allocator
         ${GTEST_LIBRARY}
         ${GTEST_MAIN_LIBRARY}
-        allocator_lib
     )
 
     if(UNIX)
@@ -55,9 +58,6 @@ if (MSVC)
         /W4
     )
     if(WITH_GOOGLE_TEST)
-        target_compile_options(allocator_lib PRIVATE
-            /MT
-        )
         target_compile_options(allocator PRIVATE
             /MT
         )
