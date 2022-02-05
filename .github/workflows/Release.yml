@@ -25,7 +25,6 @@ jobs:
     - run: cmake googletest\. -B googletest\build
     - run: cmake --build googletest\build\. --config Release
     - run: cmake --install googletest\build\.
-    - run: 
 
     - name: Setup Google benchmark
       uses: actions/checkout@v2
