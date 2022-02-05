@@ -21,9 +21,10 @@ jobs:
         repository: google/googletest
         path: googletest
 
-    - run: cmake googletest/.
-    - run: cmake --build googletest/. --config Release
-    - run: cmake --install googletest/.
+    - run: cd googletest
+    - run: cmake .
+    - run: cmake --build . --config Release
+    - run: cmake --install .
 
     - name: Setup Google benchmark
       uses: actions/checkout@v2
@@ -31,9 +32,10 @@ jobs:
         repository: google/benchmark
         path: googlebenchmark
 
-    - run: cmake googlebenchmark/.
-    - run: cmake --build googlebenchmark/. --config Release
-    - run: cmake --install googlebenchmark/.
+    - run: cd googlebenchmark
+    - run: cmake .
+    - run: cmake --build . --config Release
+    - run: cmake --install .
 
     - uses: actions/checkout@v2
       with:
