@@ -33,7 +33,7 @@ jobs:
         path: googlebenchmark
 
     - run: mkdir googlebenchmark\build
-    - run: cmake googlebenchmark\. -B googlebenchmark\build
+    - run: cmake googlebenchmark\. -B googlebenchmark\build -DGOOGLETEST_PATH="googletest\"
     - run: cmake --build googlebenchmark\build\. --config Release
     - run: cmake --install googlebenchmark\build\.
 
