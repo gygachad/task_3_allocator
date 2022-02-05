@@ -39,7 +39,7 @@ jobs:
       with:
         submodules: true
   
-    - run: cmake . -DPATCH_VERSION=${{ github.run_number }} cmake .. -DGTEST_ROOT="C:/Program Files (x86)/googletest-distribution/" -DGBENCHMARK_ROOT="c:/Program Files (x86)/benchmark/"
+    - run: cmake . -DPATCH_VERSION=${{ github.run_number }} -DGTEST_ROOT="C:/Program Files (x86)/googletest-distribution/" -DGBENCHMARK_ROOT="c:/Program Files (x86)/benchmark/"
     - run: cmake --build . --config Release
     - run: cmake --build . --config Release --target RUN_TESTS
     - run: cmake --build . --config Release --target package

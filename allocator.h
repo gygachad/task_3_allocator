@@ -2,6 +2,9 @@
 
 #include <list>
 #include <cassert>
+#include <cstring>
+#include <inttypes.h>
+#include <memory>
 
 #include "debug.h"
 
@@ -115,7 +118,7 @@ struct mem_block
 		if (m_mem_pool_start <= p &&
 			p < m_mem_pool_end)
 		{
-			unsigned __int64 pos = (p - m_mem_pool_start)/m_item_size;
+			uint64_t pos = (p - m_mem_pool_start)/m_item_size;
 			for (size_t i = 0; i < n; i++)
 			{
 				m_alloc_bytemap[pos] = false;
@@ -272,7 +275,7 @@ public:
 	void construct(U* p, Args &&...args)
 	{
 		new (p) U(std::forward<Args>(args)...);
-	};
+	}
 
 	template <typename U>
 	void destroy(U* p)
