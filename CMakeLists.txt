@@ -6,6 +6,7 @@ set(PROJECT_VESRION 0.0.${PATCH_VERSION})
 project(allocator VERSION ${PROJECT_VESRION})
 
 option(WITH_GOOGLE_TEST "Google test" ON)
+option(WITH_GOOGLE_BENCHMARK "Google benchmark" ON)
 
 configure_file(version.h.in version.h)
 
@@ -26,9 +27,7 @@ target_include_directories(allocator
 if(WITH_GOOGLE_TEST)
 
     find_package(GTest REQUIRED)
-    #find_package(benchmark REQUIRED)
     add_executable(gtest_allocator gtest_allocator.cpp version.cpp)
-    # add_executable(gbenchamark_allocator gbenchamark_allocator.cpp)
 
     set_target_properties(gtest_allocator PROPERTIES
         CXX_STANDARD 17
@@ -53,6 +52,33 @@ if(WITH_GOOGLE_TEST)
 
 endif()
 
+if(WITH_GOOGLE_BENCHMARK)
+    find_package(benchmark REQUIRED)
+    add_executable(gbenchmark_allocator gbenchmark_allocator.cpp version.cpp)
+
+    set_target_properties(gbenchmark_allocator PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED ON
+    )
+
+    include_directories(
+        ${GBENCHMARK_ROOT}/include
+    )
+
+    target_link_libraries(gbenchmark_allocator
+        ${GBENCHMARK_ROOT}lib/benchmark.lib
+        ${GBENCHMARK_ROOT}lib/benchmark_main.lib
+    )
+
+    if(UNIX)
+        find_package(Threads REQUIRED)
+        target_link_libraries(gbenchmark_allocator
+            ${CMAKE_THREAD_LIBS_INIT}
+        )
+    endif()
+
+endif()
+
 if (MSVC)
     target_compile_options(allocator PRIVATE
         /W4
@@ -63,6 +89,11 @@ if (MSVC)
         )
         target_compile_options(gtest_allocator PRIVATE
             /MT
+        )
+    endif()
+    if(WITH_GOOGLE_BENCHMARK)
+        target_compile_options(gbenchmark_allocator PRIVATE
+            /MD
         )
     endif()
 else ()
