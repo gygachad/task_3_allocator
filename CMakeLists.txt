@@ -38,18 +38,18 @@ if(WITH_GOOGLE_TEST)
         ${GTEST_INCLUDE_DIR}
     )
 
+    target_link_libraries(gtest_allocator
+        ${GTEST_LIBRARY}
+        ${GTEST_MAIN_LIBRARY}
+    )
+
     if(UNIX)
         find_package(Threads REQUIRED)
         target_link_libraries(gtest_allocator
             ${CMAKE_THREAD_LIBS_INIT}
-        )
-    else()
-        target_link_libraries(gtest_allocator
-        ${GTEST_LIBRARY}
-        ${GTEST_MAIN_LIBRARY}
-        )
+        )        
     endif()
-
+    
 endif()
 
 if(WITH_GOOGLE_BENCHMARK)
