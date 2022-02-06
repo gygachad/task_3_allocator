@@ -146,6 +146,7 @@ class mem_pool
 
 public:
 	mem_pool(){}
+	mem_pool(const mem_pool& other) = delete;
 
 	~mem_pool() 
 	{

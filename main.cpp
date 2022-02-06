@@ -6,6 +6,7 @@
 #include <chrono>
 
 #include "allocator.h"
+#include "single_linked_list.h"
 
 using namespace std;
 using std::chrono::high_resolution_clock;
@@ -43,5 +44,15 @@ int main()
     print_map(m1);
     print_map(m2);
     
+    //single_linked_container<int> int_list;
+    single_linked_container<int, linear_allocator<int>> int_list;
+
+    for (int i = 0; i < 10; i++)
+    {
+        int_list.insert(i);
+    }
+
+    int b = int_list[4];
+
     return 0;
 }
