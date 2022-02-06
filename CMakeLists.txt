@@ -49,7 +49,7 @@ if(WITH_GOOGLE_TEST)
             ${CMAKE_THREAD_LIBS_INIT}
         )        
     endif()
-    
+
 endif()
 
 if(WITH_GOOGLE_BENCHMARK)
@@ -119,4 +119,5 @@ include(CPack)
 if(WITH_GOOGLE_TEST)
     enable_testing()
     add_test(gtest_allocator gtest_allocator)
+    add_test(gbenchmark_allocator gbenchmark_allocator)
 endif()
