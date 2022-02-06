@@ -38,15 +38,15 @@ if(WITH_GOOGLE_TEST)
         ${GTEST_INCLUDE_DIR}
     )
 
-    target_link_libraries(gtest_allocator
-        ${GTEST_LIBRARY}
-        ${GTEST_MAIN_LIBRARY}
-    )
-
     if(UNIX)
         find_package(Threads REQUIRED)
         target_link_libraries(gtest_allocator
             ${CMAKE_THREAD_LIBS_INIT}
+        )
+    else()
+        target_link_libraries(gtest_allocator
+        ${GTEST_LIBRARY}
+        ${GTEST_MAIN_LIBRARY}
         )
     endif()
 
@@ -61,19 +61,19 @@ if(WITH_GOOGLE_BENCHMARK)
         CXX_STANDARD_REQUIRED ON
     )
 
-    include_directories(
-        ${GBENCHMARK_ROOT}/include
-    )
-
-    target_link_libraries(gbenchmark_allocator
-        ${GBENCHMARK_ROOT}lib/benchmark.lib
-        ${GBENCHMARK_ROOT}lib/benchmark_main.lib
-    )
-
     if(UNIX)
         find_package(Threads REQUIRED)
         target_link_libraries(gbenchmark_allocator
-            ${CMAKE_THREAD_LIBS_INIT}
+            -lbenchmark
+        )
+    else()
+        include_directories(
+            ${GBENCHMARK_ROOT}/include
+        )
+    
+        target_link_libraries(gbenchmark_allocator
+            ${GBENCHMARK_ROOT}lib/benchmark.lib
+            ${GBENCHMARK_ROOT}lib/benchmark_main.lib
         )
     endif()
 
