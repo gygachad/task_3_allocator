@@ -80,32 +80,7 @@ class single_linked_container
     
     single_linked_list<T> m_item_list;
 
-public:
-    size_t m_items = 0x0;
-
-    single_linked_container() {};
-
-    single_linked_container(const single_linked_container& other)
-    {
-        Node<T>* copied_node = other.m_item_list.m_head;
-        Node<T>* prev_node = nullptr;
-
-        for (m_items = 0; m_items != other.m_items; m_items++)
-        {
-            //Use defined allocator
-            Node<T>* new_node = (Node<T>*)m_node_allocator.allocate(1);
-            
-            new_node->data = T(copied_node->data);
-
-            //Insert to list tail
-            m_item_list.insert_item(prev_node, new_node);
-
-            copied_node = copied_node->next;
-            prev_node = new_node;
-        }
-    }
-
-    ~single_linked_container() 
+    void free_item_list()
     {
         Node<T>* delete_node = nullptr;
         Node<T>* next_node = m_item_list.m_head;
@@ -124,6 +99,41 @@ public:
 
             m_items--;
         }
+    }
+
+    void copy_items(const single_linked_list<T>& item_list, const size_t& items)
+    {
+        Node<T>* copied_node = item_list.m_head;
+        Node<T>* prev_node = nullptr;
+
+        for (m_items = 0; m_items != items; m_items++)
+        {
+            //Use defined allocator
+            Node<T>* new_node = (Node<T>*)m_node_allocator.allocate(1);
+
+            new_node->data = T(copied_node->data);
+
+            //Insert to list tail
+            m_item_list.insert_item(prev_node, new_node);
+
+            copied_node = copied_node->next;
+            prev_node = new_node;
+        }
+    }
+
+public:
+    size_t m_items = 0x0;
+
+    single_linked_container() {};
+
+    single_linked_container(const single_linked_container& other)
+    {
+        copy_items(other.m_item_list, other.m_item_list)
+    }
+
+    ~single_linked_container() 
+    {
+        free_item_list();
     }
 
     size_t size()
@@ -149,6 +159,20 @@ public:
         m_items++;
     }
 
+    single_linked_container& operator=(const single_linked_container& other)
+    {
+        // Guard self assignment
+        if (this == &other)
+            return *this;
+
+        //Delete old data
+        free_item_list();
+        //Copy list
+        copy_items(other.m_item_list, other.m_items);
+
+        return *this;
+    }
+
     T& operator[](const size_t Pos)
     {
         Node<T>* next = m_item_list.m_head;
@@ -157,9 +181,7 @@ public:
         size_t counter = m_items - Pos - 1;
 
         while(counter--)
-        {
             next = next->next;
-        }
 
         return next->data;
     }

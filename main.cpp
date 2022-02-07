@@ -46,7 +46,6 @@ int main()
     while (1)
     {
         {
-            
             single_linked_container<int> a;
             for (int i = 0; i < 10; i++)
                 a.insert(i);
@@ -56,14 +55,21 @@ int main()
                 
             //single_linked_container<int> b = a;
 
-            single_linked_container<string> c;
+            single_linked_container<string, linear_allocator<string>> c;
             for (int i = 0; i < 10; i++)
                 c.insert("string " + to_string(i));
 
-            single_linked_container<string> d = c;
+            single_linked_container<string, linear_allocator<string>> d;
+            for (int i = 0; i < 10; i++)
+                d.insert("d_string " + to_string(i));
+
+            d = c;
 
             for (int i = 0; i < 10; i++)
                 cout << d[i] << endl;
+
+            for (int i = 0; i < 10; i++)
+                cout << c[i] << endl;
         }
     }
 
