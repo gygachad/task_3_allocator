@@ -31,7 +31,6 @@ int factorial(unsigned int n)
 
 int main() 
 {
-    
     map<int, int, less<int>, linear_allocator<pair<const int, int>>> m1;
     map<int, int> m2;
 
@@ -44,15 +43,29 @@ int main()
     print_map(m1);
     print_map(m2);
     
-    //single_linked_container<int> int_list;
-    single_linked_container<int, linear_allocator<int>> int_list;
-
-    for (int i = 0; i < 10; i++)
+    while (1)
     {
-        int_list.insert(i);
-    }
+        {
+            
+            single_linked_container<int> a;
+            for (int i = 0; i < 10; i++)
+                a.insert(i);
+            
+            for (int i = 0; i < 10; i++)
+                cout << a[i] << endl;
+                
+            //single_linked_container<int> b = a;
 
-    int b = int_list[4];
+            single_linked_container<string> c;
+            for (int i = 0; i < 10; i++)
+                c.insert("string " + to_string(i));
+
+            single_linked_container<string> d = c;
+
+            for (int i = 0; i < 10; i++)
+                cout << d[i] << endl;
+        }
+    }
 
     return 0;
 }

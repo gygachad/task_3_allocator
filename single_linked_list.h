@@ -6,14 +6,15 @@ struct Node
 };
 
 template <class T>
-class single_linked_list 
-{
-public:    
+struct single_linked_list 
+{    
     Node<T> * m_head = nullptr;
-    
-public:
+
     single_linked_list() {}
-    single_linked_list(const single_linked_list& other) = delete;
+    single_linked_list(const single_linked_list& other) 
+    {
+        UNUSED(other);
+    };
 
     void insert_item(Node<T>* previousNode, Node<T>* newNode) 
     {
@@ -71,19 +72,59 @@ public:
 };
 
 template <class T, class _Alloc = allocator<T>>
-class single_linked_container : single_linked_list<T>
+class single_linked_container
 {
-    typedef typename _Alloc::template rebind<Node<T>>::other NodeAllocator;
+    using NodeAllocator = typename std::allocator_traits<_Alloc>::template rebind_alloc<Node<T>>;
 
     NodeAllocator m_node_allocator = NodeAllocator();
-
-    size_t m_items = 0x0;
+    
+    single_linked_list<T> m_item_list;
 
 public:
-    single_linked_container() {};
-    single_linked_container(const single_linked_container& other) = delete;
+    size_t m_items = 0x0;
 
-    ~single_linked_container() {};
+    single_linked_container() {};
+
+    single_linked_container(const single_linked_container& other)
+    {
+        Node<T>* copied_node = other.m_item_list.m_head;
+        Node<T>* prev_node = nullptr;
+
+        for (m_items = 0; m_items != other.m_items; m_items++)
+        {
+            //Use defined allocator
+            Node<T>* new_node = (Node<T>*)m_node_allocator.allocate(1);
+            
+            new_node->data = T(copied_node->data);
+
+            //Insert to list tail
+            m_item_list.insert_item(prev_node, new_node);
+
+            copied_node = copied_node->next;
+            prev_node = new_node;
+        }
+    }
+
+    ~single_linked_container() 
+    {
+        Node<T>* delete_node = nullptr;
+        Node<T>* next_node = m_item_list.m_head;
+
+        while (m_items)
+        {
+            //Always delete from head
+            m_item_list.remove_item(nullptr, next_node);
+
+            delete_node = next_node;
+            next_node = next_node->next;
+
+            delete_node->data.~T();
+
+            m_node_allocator.deallocate(delete_node, 1);
+
+            m_items--;
+        }
+    }
 
     size_t size()
     {
@@ -100,17 +141,17 @@ public:
         //Use defined allocator
         Node<T>* new_node = (Node<T>*)m_node_allocator.allocate(1);
 
-        new_node->data = item;
+        new_node->data = T(item);
 
         //Insert always in head
-        insert_item(nullptr, new_node);
+        m_item_list.insert_item(nullptr, new_node);
 
         m_items++;
     }
 
     T& operator[](const size_t Pos)
     {
-        Node<T>* next = m_head;
+        Node<T>* next = m_item_list.m_head;
 
         //-1 because items pos counted form 0
         size_t counter = m_items - Pos - 1;

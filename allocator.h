@@ -246,9 +246,6 @@ public:
 	using const_pointer = const T*;
 	using reference = T&;
 	using const_reference = const T&;
-
-	template <typename U>
-	struct rebind { using other = linear_allocator<U>; };
 	
 	linear_allocator(){}
 
@@ -258,6 +255,18 @@ public:
 	linear_allocator(const linear_allocator<U>& other)
 	{
 		m_shared_mem_pool = other.m_shared_mem_pool;
+	}
+
+	template<typename U>
+	constexpr bool operator== (const linear_allocator<U>&)
+	{ 
+		return true;
+	}
+
+	template<typename U>
+	constexpr bool operator!= (const linear_allocator<U>&)
+	{
+		return false;
 	}
 
 	T* allocate(size_t n)
@@ -271,7 +280,7 @@ public:
 	{
 		m_shared_mem_pool->deallocate(p, n);
 	}
-
+	/*
 	template <typename U, typename... Args>
 	void construct(U* p, Args &&...args)
 	{
@@ -283,4 +292,5 @@ public:
 	{
 		p->~U();
 	}
+	*/
 };
