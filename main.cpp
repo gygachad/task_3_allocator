@@ -53,7 +53,7 @@ int main()
             for (int i = 0; i < 10; i++)
                 cout << a[i] << endl;
                 
-            //single_linked_container<int> b = a;
+            single_linked_container<int> b = a;
 
             single_linked_container<string, linear_allocator<string>> c;
             for (int i = 0; i < 10; i++)

@@ -128,7 +128,7 @@ public:
 
     single_linked_container(const single_linked_container& other)
     {
-        copy_items(other.m_item_list, other.m_item_list)
+        copy_items(other.m_item_list, other.m_items);
     }
 
     ~single_linked_container() 
