@@ -29,6 +29,7 @@ int factorial(unsigned int n)
     return n * factorial(n - 1);
 }
 
+
 int main() 
 {
     map<int, int, less<int>, linear_allocator<pair<const int, int>>> m1;
@@ -48,7 +49,7 @@ int main()
         {
             single_linked_container<int> a;
             for (int i = 0; i < 10; i++)
-                a.insert(i);
+                a.push_back(i);
             
             for (int i = 0; i < 10; i++)
                 cout << a[i] << endl;
@@ -57,19 +58,19 @@ int main()
 
             single_linked_container<string, linear_allocator<string>> c;
             for (int i = 0; i < 10; i++)
-                c.insert("string " + to_string(i));
+                c.push_back("string " + to_string(i));
 
             single_linked_container<string, linear_allocator<string>> d;
             for (int i = 0; i < 10; i++)
-                d.insert("d_string " + to_string(i));
+                d.push_back("d_string " + to_string(i));
+
+            for (const auto& m : c)
+                cout << m << endl;
 
             d = c;
 
             for (int i = 0; i < 10; i++)
                 cout << d[i] << endl;
-
-            for (int i = 0; i < 10; i++)
-                cout << c[i] << endl;
         }
     }
 

@@ -5,6 +5,35 @@ struct Node
     Node* next;
 };
 
+template <class T>
+ostream& operator<<(ostream& os, const Node<T>& dt)
+{
+    cout << dt.data;
+    return os;
+}
+
+template<typename T>
+class linear_iterator
+{
+public:
+    typedef linear_iterator self_type;
+    typedef T value_type;
+    typedef T& reference;
+    typedef T* pointer;
+    typedef std::forward_iterator_tag iterator_category;
+    typedef int difference_type;
+    linear_iterator() { }
+    linear_iterator(pointer ptr) : ptr_(ptr) { }
+    self_type operator++() { self_type i = *this; ptr_++; return i; }
+    self_type operator++(int junk) { ptr_++; return *this; }
+    reference operator*() { return *ptr_; }
+    pointer operator->() { return ptr_; }
+    bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
+    bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+private:
+    pointer ptr_;
+};
+
 template <class T, class _Alloc = allocator<T>>
 class single_linked_container
 {
@@ -51,6 +80,7 @@ class single_linked_container
 
         m_tail = newNode;
     }
+
     void remove_item(Node<T>* previousNode, Node<T>* deleteNode)
     {
         if (previousNode == m_head)
@@ -140,7 +170,7 @@ public:
         return m_items == 0;
     }
 
-    void insert(const T& item)
+    void push_back(const T& item)
     {
         //Use defined allocator
         Node<T>* new_node = (Node<T>*)m_node_allocator.allocate(1);
@@ -177,5 +207,18 @@ public:
             next = next->next;
 
         return next->data;
+    }
+
+    linear_iterator<Node<T>> begin()
+    {
+        auto it = linear_iterator<Node<T>>(m_head);
+        return it;
+    }
+
+    linear_iterator<Node<T>> end()
+    {
+        auto it = linear_iterator<Node<T>>(m_tail);
+
+        return it;
     }
 };
