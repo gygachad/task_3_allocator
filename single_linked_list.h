@@ -5,72 +5,6 @@ struct Node
     Node* next;
 };
 
-template <class T>
-struct single_linked_list 
-{    
-    Node<T> * m_head = nullptr;
-
-    single_linked_list() {}
-    single_linked_list(const single_linked_list& other) 
-    {
-        UNUSED(other);
-    };
-
-    void insert_item(Node<T>* previousNode, Node<T>* newNode) 
-    {
-        if (previousNode == nullptr) 
-        {
-            // Is the first node
-            if (m_head != nullptr) 
-            {
-                // The list has more elements
-                newNode->next = m_head;
-            }
-            else 
-            {
-                newNode->next = nullptr;
-            }
-            m_head = newNode;
-        }
-        else 
-        {
-            if (previousNode->next == nullptr) 
-            {
-                // Is the last node
-                previousNode->next = newNode;
-                newNode->next = nullptr;
-            }
-            else 
-            {
-                // Is a middle node
-                newNode->next = previousNode->next;
-                previousNode->next = newNode;
-            }
-        }
-    }
-    void remove_item(Node<T>* previousNode, Node<T>* deleteNode) 
-    {
-        if (previousNode == nullptr) 
-        {
-            // Is the first node
-            if (deleteNode->next == nullptr) 
-            {
-                // List only has one element
-                m_head = nullptr;
-            }
-            else 
-            {
-                // List has more elements
-                m_head = deleteNode->next;
-            }
-        }
-        else 
-        {
-            previousNode->next = deleteNode->next;
-        }
-    }
-};
-
 template <class T, class _Alloc = allocator<T>>
 class single_linked_container
 {
@@ -78,17 +12,77 @@ class single_linked_container
 
     NodeAllocator m_node_allocator = NodeAllocator();
     
-    single_linked_list<T> m_item_list;
+    Node<T>* m_head = nullptr;
+    Node<T>* m_tail = nullptr;
+
+    void insert_item(Node<T>* previousNode, Node<T>* newNode)
+    {
+        if (previousNode == nullptr)
+        {
+            // Is the first node
+            if (m_head != nullptr)
+            {
+                // The list has more elements
+                newNode->next = m_head;
+            }
+            else
+            {
+                newNode->next = nullptr;
+            }
+            m_head = newNode;
+            m_tail = newNode;
+        }
+        else
+        {
+            if (previousNode->next == nullptr)
+            {
+                // Is the last node
+                previousNode->next = newNode;
+                newNode->next = nullptr;
+                m_tail = newNode;
+            }
+            else
+            {
+                // Is a middle node
+                newNode->next = previousNode->next;
+                previousNode->next = newNode;
+            }
+        }
+
+        m_tail = newNode;
+    }
+    void remove_item(Node<T>* previousNode, Node<T>* deleteNode)
+    {
+        if (previousNode == m_head)
+        {
+            // Is the first node
+            if (deleteNode->next == nullptr)
+            {
+                // List only has one element
+                m_head = nullptr;
+                m_tail = nullptr;
+            }
+            else
+            {
+                // List has more elements
+                m_head = deleteNode->next;
+            }
+        }
+        else
+        {
+            previousNode->next = deleteNode->next;
+        }
+    }
 
     void free_item_list()
     {
         Node<T>* delete_node = nullptr;
-        Node<T>* next_node = m_item_list.m_head;
+        Node<T>* next_node = m_head;
 
         while (m_items)
         {
             //Always delete from head
-            m_item_list.remove_item(nullptr, next_node);
+            remove_item(m_head, next_node);
 
             delete_node = next_node;
             next_node = next_node->next;
@@ -101,9 +95,9 @@ class single_linked_container
         }
     }
 
-    void copy_items(const single_linked_list<T>& item_list, const size_t& items)
+    void copy_items(const Node<T>* head, const size_t& items)
     {
-        Node<T>* copied_node = item_list.m_head;
+        const Node<T>* copied_node = head;
         Node<T>* prev_node = nullptr;
 
         for (m_items = 0; m_items != items; m_items++)
@@ -114,7 +108,7 @@ class single_linked_container
             new_node->data = T(copied_node->data);
 
             //Insert to list tail
-            m_item_list.insert_item(prev_node, new_node);
+            insert_item(prev_node, new_node);
 
             copied_node = copied_node->next;
             prev_node = new_node;
@@ -128,7 +122,7 @@ public:
 
     single_linked_container(const single_linked_container& other)
     {
-        copy_items(other.m_item_list, other.m_items);
+        copy_items(other.m_head, other.m_items);
     }
 
     ~single_linked_container() 
@@ -153,9 +147,9 @@ public:
 
         new_node->data = T(item);
 
-        //Insert always in head
-        m_item_list.insert_item(nullptr, new_node);
-
+        //Insert always in tail
+        insert_item(m_tail, new_node);
+        
         m_items++;
     }
 
@@ -168,17 +162,16 @@ public:
         //Delete old data
         free_item_list();
         //Copy list
-        copy_items(other.m_item_list, other.m_items);
+        copy_items(other.m_head, other.m_items);
 
         return *this;
     }
 
     T& operator[](const size_t Pos)
     {
-        Node<T>* next = m_item_list.m_head;
+        Node<T>* next = m_head;
 
-        //-1 because items pos counted form 0
-        size_t counter = m_items - Pos - 1;
+        size_t counter = Pos;
 
         while(counter--)
             next = next->next;
