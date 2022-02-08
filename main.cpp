@@ -47,6 +47,7 @@ int main()
     while (1)
     {
         {
+            
             single_linked_container<int> a;
             for (int i = 0; i < 10; i++)
                 a.push_back(i);
@@ -55,11 +56,11 @@ int main()
                 cout << a[i] << endl;
                 
             single_linked_container<int> b = a;
-
+            
             single_linked_container<string, linear_allocator<string>> c;
             for (int i = 0; i < 10; i++)
                 c.push_back("string " + to_string(i));
-
+            
             single_linked_container<string, linear_allocator<string>> d;
             for (int i = 0; i < 10; i++)
                 d.push_back("d_string " + to_string(i));

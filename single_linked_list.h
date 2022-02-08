@@ -3,6 +3,8 @@ struct Node
 {
     T data;
     Node* next;
+
+    Node(const T& item) { data = item; }
 };
 
 template <class T>
@@ -134,8 +136,10 @@ class single_linked_container
         {
             //Use defined allocator
             Node<T>* new_node = (Node<T>*)m_node_allocator.allocate(1);
+            
+            allocator_traits<NodeAllocator>::construct(m_node_allocator, new_node, Node<T>(copied_node->data));
 
-            new_node->data = T(copied_node->data);
+            //new_node->data = T(copied_node->data);
             new_node->next = nullptr;
 
             //Insert to list tail
@@ -176,7 +180,9 @@ public:
         //Use defined allocator
         Node<T>* new_node = (Node<T>*)m_node_allocator.allocate(1);
 
-        new_node->data = T(item);
+        allocator_traits<NodeAllocator>::construct(m_node_allocator, new_node, Node<T>(item));
+
+        //new_node->data = T(item);
         new_node->next = nullptr;
 
         //Insert always in tail

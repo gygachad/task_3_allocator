@@ -280,7 +280,7 @@ public:
 	{
 		m_shared_mem_pool->deallocate(p, n);
 	}
-	/*
+
 	template <typename U, typename... Args>
 	void construct(U* p, Args &&...args)
 	{
@@ -292,5 +292,4 @@ public:
 	{
 		p->~U();
 	}
-	*/
 };
