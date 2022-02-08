@@ -18,7 +18,7 @@ protected:
     /* none yet */
 };
 
-TEST_F(TestSerialization, MainTest)
+TEST_F(TestSerialization, allocator_test)
 {
     EXPECT_TRUE(version() > 0);
 
@@ -36,27 +36,59 @@ TEST_F(TestSerialization, MainTest)
     single_linked_container<int> a;
     for (int i = 0; i < 10; i++)
         a.push_back(i);
+}
+
+TEST_F(TestSerialization, container_pushback_test)
+{
+    single_linked_container<int> a;
+    for (int i = 0; i < 10; i++)
+        a.push_back(i);
+}
+
+TEST_F(TestSerialization, container_operator_test)
+{
+    single_linked_container<int> a;
+    for (int i = 0; i < 10; i++)
+        a.push_back(i);
 
     for (int i = 0; i < 10; i++)
-        cout << a[i] << endl;
+        EXPECT_TRUE(a[i] == i);
+}
 
-    single_linked_container<int> b = a;
+TEST_F(TestSerialization, container_copy_test)
+{
+    single_linked_container<int> a;
+    for (int i = 0; i < 10; i++)
+        a.push_back(i);
 
+    single_linked_container<int> b(a);
+
+    for (size_t i = 0; i < 10; i++)
+        EXPECT_TRUE(b[i] == a[i]);
+}
+
+TEST_F(TestSerialization, container_opeartor_copy_test)
+{
     single_linked_container<string, linear_allocator<string>> c;
     for (int i = 0; i < 10; i++)
         c.push_back("string " + to_string(i));
 
     single_linked_container<string, linear_allocator<string>> d;
-    for (int i = 0; i < 10; i++)
-        d.push_back("d_string " + to_string(i));
 
     d = c;
 
     for (int i = 0; i < 10; i++)
-        cout << d[i] << endl;
+        EXPECT_TRUE(d[i] == c[i]);
+}
 
+TEST_F(TestSerialization, container_iterator_test)
+{
+    single_linked_container<string, linear_allocator<string>> c;
     for (int i = 0; i < 10; i++)
-        cout << c[i] << endl;
+        c.push_back("string " + to_string(i));
+
+    for (const auto& m : c)
+        cout << m << endl;
 }
 
 int main(int argc, char** argv) 

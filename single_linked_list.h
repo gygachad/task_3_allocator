@@ -136,6 +136,7 @@ class single_linked_container
             Node<T>* new_node = (Node<T>*)m_node_allocator.allocate(1);
 
             new_node->data = T(copied_node->data);
+            new_node->next = nullptr;
 
             //Insert to list tail
             insert_item(prev_node, new_node);
@@ -176,6 +177,7 @@ public:
         Node<T>* new_node = (Node<T>*)m_node_allocator.allocate(1);
 
         new_node->data = T(item);
+        new_node->next = nullptr;
 
         //Insert always in tail
         insert_item(m_tail, new_node);
