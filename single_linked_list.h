@@ -1,3 +1,5 @@
+#include<iostream>
+
 template <class T>
 struct Node
 {
@@ -10,7 +12,7 @@ struct Node
 template <class T>
 ostream& operator<<(ostream& os, const Node<T>& dt)
 {
-    cout << dt.data;
+    std::cout << dt.data;
     return os;
 }
 
