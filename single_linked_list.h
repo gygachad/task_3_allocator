@@ -19,8 +19,6 @@ class linear_iterator
 {
 public:
     linear_iterator() { }
-    linear_iterator& operator=(const linear_iterator& other) { return *this; }
-
     linear_iterator(T* ptr) { ptr_ = ptr; }
 
     ~linear_iterator() {}
