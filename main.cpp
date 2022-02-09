@@ -3,24 +3,9 @@
 #include <string>
 #include <string_view>
 #include <vector>
-#include <chrono>
 
 #include "allocator.h"
 #include "single_linked_list.h"
-
-using namespace std;
-using std::chrono::high_resolution_clock;
-using std::chrono::duration_cast;
-using std::chrono::milliseconds;
-
-template<typename T>
-void print_map(const T& m)
-{
-    for (const auto& [key, value] : m) 
-        std::cout << key << " " << value << endl;
-    
-    std::cout << '\n';
-}
 
 int factorial(unsigned int n)
 {
@@ -41,39 +26,42 @@ int main()
         m2[i] = factorial(i);
     }
 
-    print_map(m1);
-    print_map(m2);
+    for (const auto& [key, value] : m1) 
+        std::cout << key << " " << value << endl;
+
+    for (const auto& [key, value] : m1)
+        std::cout << key << " " << value << endl;
     
-    while (1)
+    single_linked_container<int> c1;
+    for (int i = 0; i < 10; i++)
+        c1.push_back(i);
+    
+    for (const auto& m : c1)
+        cout << m << endl;
+
+    single_linked_container<int, linear_allocator<int>> c2;
+    for (int i = 0; i < 10; i++)
+        c2.push_back(i);
+
+    for (const auto& m : c2)
+        cout << m << endl;
+        
+
+    single_linked_container<string> c3;
+    for (int i = 0; i < 10; i++)
+        c3.push_back("c3_string " + to_string(i));
+
+    for (auto it = c3.begin(); it != c3.end(); it++)
     {
-        {
-            
-            single_linked_container<int> a;
-            for (int i = 0; i < 10; i++)
-                a.push_back(i);
-            
-            for (int i = 0; i < 10; i++)
-                cout << a[i] << endl;
-                
-            single_linked_container<int> b = a;
-            
-            single_linked_container<string, linear_allocator<string>> c;
-            for (int i = 0; i < 10; i++)
-                c.push_back("string " + to_string(i));
-            
-            single_linked_container<string, linear_allocator<string>> d;
-            for (int i = 0; i < 10; i++)
-                d.push_back("d_string " + to_string(i));
-
-            for (const auto& m : c)
-                cout << m << endl;
-
-            d = c;
-
-            for (int i = 0; i < 10; i++)
-                cout << d[i] << endl;
-        }
+        cout << *it << endl;
     }
+
+    single_linked_container<string, linear_allocator<string>> c4;
+    for (int i = 0; i < 10; i++)
+        c4.push_back("c4_string " + to_string(i));
+    
+    for (const auto& m : c4)
+        cout << m << endl;
 
     return 0;
 }

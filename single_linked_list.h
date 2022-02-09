@@ -3,8 +3,8 @@ struct Node
 {
     T data;
     Node* next;
-
     Node(const T& item) { data = item; }
+    Node<T>* operator++(int) { return next; }
 };
 
 template <class T>
@@ -18,22 +18,34 @@ template<typename T>
 class linear_iterator
 {
 public:
-    typedef linear_iterator self_type;
-    typedef T value_type;
-    typedef T& reference;
-    typedef T* pointer;
-    typedef std::forward_iterator_tag iterator_category;
-    typedef int difference_type;
     linear_iterator() { }
-    linear_iterator(pointer ptr) : ptr_(ptr) { }
-    self_type operator++() { self_type i = *this; ptr_++; return i; }
-    self_type operator++(int junk) { ptr_++; return *this; }
-    reference operator*() { return *ptr_; }
-    pointer operator->() { return ptr_; }
-    bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
-    bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+    linear_iterator& operator=(const linear_iterator& other) { return *this; }
+
+    linear_iterator(T* ptr) { ptr_ = ptr; }
+
+    ~linear_iterator() {}
+
+    linear_iterator operator++()
+    { 
+        ptr_ = (*ptr_)++;
+        return *this;
+    }
+
+    linear_iterator& operator++(int)
+    { 
+        ptr_ = (*ptr_)++;
+        return *this; 
+    }
+
+    T& operator*() { return *ptr_; }
+    T* operator->() { return ptr_; }
+    bool operator==(const linear_iterator& rhs) { return ptr_ == rhs.ptr_; }
+    bool operator!=(const linear_iterator& rhs) 
+    { 
+        return ptr_ != rhs.ptr_; 
+    }
 private:
-    pointer ptr_;
+    T* ptr_;
 };
 
 template <class T, class _Alloc = allocator<T>>
@@ -137,9 +149,9 @@ class single_linked_container
             //Use defined allocator
             Node<T>* new_node = (Node<T>*)m_node_allocator.allocate(1);
             
+            //Construct new node via traits (C++20)
             allocator_traits<NodeAllocator>::construct(m_node_allocator, new_node, Node<T>(copied_node->data));
 
-            //new_node->data = T(copied_node->data);
             new_node->next = nullptr;
 
             //Insert to list tail
@@ -180,9 +192,10 @@ public:
         //Use defined allocator
         Node<T>* new_node = (Node<T>*)m_node_allocator.allocate(1);
 
+        //new_node->data = T(item); ---> Seg fault while on copy string from item to data
         allocator_traits<NodeAllocator>::construct(m_node_allocator, new_node, Node<T>(item));
 
-        //new_node->data = T(item);
+        //This is last item - point to null
         new_node->next = nullptr;
 
         //Insert always in tail
@@ -225,8 +238,8 @@ public:
 
     linear_iterator<Node<T>> end()
     {
-        auto it = linear_iterator<Node<T>>(m_tail);
-
+        //Last item always point to null
+        auto it = linear_iterator<Node<T>>(nullptr);
         return it;
     }
 };
